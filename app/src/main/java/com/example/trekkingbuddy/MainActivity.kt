@@ -8,9 +8,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainActivity : ComponentActivity() {
 
-
-
-
     private lateinit var firebaseAnalytics: FirebaseAnalytics  // ✅ Firebase Analytics variable
 
     override fun onCreate(savedInstanceState: Bundle?) {

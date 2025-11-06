@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374763937185",
+    "project_id": "trekking-buddy-95b99",
+    "storage_bucket": "trekking-buddy-95b99.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374763937185:android:9343f73ccba2c1eab3bfe0",
+        "android_client_info": {
+          "package_name": "com.example.trekkingbuddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8yLnf4QpCQVUKGy_3D24CA-6DJBIdVy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

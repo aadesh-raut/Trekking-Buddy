@@ -20,6 +20,10 @@ class AuthViewModel : ViewModel() {
 
     val authState = mutableStateOf<AuthState>(AuthState.Idle)
 
+    // 🚀 These will be assigned by NavGraph so screens can navigate after login/signup
+    var onLoginSuccess: (() -> Unit)? = null
+    var onSignupSuccess: (() -> Unit)? = null
+
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
             authState.value = AuthState.Loading
@@ -28,6 +32,12 @@ class AuthViewModel : ViewModel() {
                 val user = result.user
                 if (user != null) {
                     authState.value = AuthState.Success(user.uid)
+
+                    // 🚀 Trigger navigation
+                    onSignupSuccess?.invoke()
+
+                    // Reset so Compose does not navigate multiple times
+                    authState.value = AuthState.Idle
                 } else {
                     authState.value = AuthState.Error("Signup failed")
                 }
@@ -45,6 +55,12 @@ class AuthViewModel : ViewModel() {
                 val user = result.user
                 if (user != null) {
                     authState.value = AuthState.Success(user.uid)
+
+                    // 🚀 Trigger navigation
+                    onLoginSuccess?.invoke()
+
+                    // Reset state
+                    authState.value = AuthState.Idle
                 } else {
                     authState.value = AuthState.Error("Login failed")
                 }
@@ -59,5 +75,6 @@ class AuthViewModel : ViewModel() {
         authState.value = AuthState.Idle
     }
 }
+
 
 

@@ -13,6 +13,13 @@ fun LoginScreen(viewModel: AuthViewModel, onNavigateToSignup: () -> Unit) {
     var password by remember { mutableStateOf("") }
     val authState = viewModel.authState.value
 
+    // 🚀 If login is successful → trigger navigation
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            viewModel.onLoginSuccess?.invoke()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +60,6 @@ fun LoginScreen(viewModel: AuthViewModel, onNavigateToSignup: () -> Unit) {
         when (authState) {
             is AuthState.Loading -> Text("Loading...")
             is AuthState.Error -> Text("Error: ${authState.message}", color = MaterialTheme.colorScheme.error)
-            is AuthState.Success -> Text("Login successful!", color = MaterialTheme.colorScheme.primary)
             else -> {}
         }
     }
@@ -64,6 +70,13 @@ fun SignupScreen(viewModel: AuthViewModel, onNavigateToLogin: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val authState = viewModel.authState.value
+
+    // 🚀 If signup is successful → trigger navigation
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            viewModel.onSignupSuccess?.invoke()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -105,11 +118,11 @@ fun SignupScreen(viewModel: AuthViewModel, onNavigateToLogin: () -> Unit) {
         when (authState) {
             is AuthState.Loading -> Text("Creating account...")
             is AuthState.Error -> Text("Error: ${authState.message}", color = MaterialTheme.colorScheme.error)
-            is AuthState.Success -> Text("Account created!", color = MaterialTheme.colorScheme.primary)
             else -> {}
         }
     }
 }
+
 
 
 

@@ -26,13 +26,26 @@ fun saveLocationToFirebase(location: String) {
         .set(mapOf("selectedLocation" to location))
 }
 
+// --------------------------------------------
+// CLEAR SELECTED LOCATION (DESELECT)
+// --------------------------------------------
+fun clearSelectedLocationFromFirebase() {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+    FirebaseFirestore.getInstance()
+        .collection("users")
+        .document(userId)
+        .collection("preference")
+        .document("data")
+        .set(mapOf("selectedLocation" to null))
+}
+
 @Composable
 fun LocationDetailScreen(
     locationName: String,
     navController: NavHostController,
     onSave: (String) -> Unit
 ) {
-
     var isSelected by remember { mutableStateOf(false) }
 
     Column(
@@ -64,7 +77,7 @@ fun LocationDetailScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // --------------------------------------------
-        // DESCRIPTION TEXT (placeholder for now)
+        // DESCRIPTION TEXT
         // --------------------------------------------
         Text(
             text = "Description about the trekking location will come here.",
@@ -86,36 +99,39 @@ fun LocationDetailScreen(
                 Text("Cancel")
             }
 
-            // ✅ Select Button — turns green & stays on screen
-            Button(
-                onClick = {
-                    if (!isSelected) {
-                        saveLocationToFirebase(locationName)   // Save to Firestore
-                        onSave(locationName)                   // Callback to update parent screen
-                        isSelected = true                      // Turn button green
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) Color(0xFF4CAF50) // Green color
-                    else MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = if (isSelected) "Selected" else "Select"
-                )
+            // 👉 If location is already selected → show DESELECT button
+            if (isSelected) {
+                Button(
+                    onClick = {
+                        clearSelectedLocationFromFirebase()
+                        isSelected = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Text("Deselect")
+                }
+
+            } else {
+                // 👉 If not selected → show SELECT button
+                Button(
+                    onClick = {
+                        saveLocationToFirebase(locationName)
+                        onSave(locationName)
+                        isSelected = true
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Select")
+                }
             }
         }
     }
 }
-fun clearSelectedLocationFromFirebase() {
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-    FirebaseFirestore.getInstance()
-        .collection("users")
-        .document(userId)
-        .collection("preference")
-        .document("data")
-        .set(mapOf("selectedLocation" to null))
-}
+
 
 
 

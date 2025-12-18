@@ -18,6 +18,7 @@ import com.example.trekkingbuddy.ui.preferences.LocationDetailScreen
 @Composable
 fun MainScreen(navController: NavHostController) {
 
+    // 🔥 Bottom navigation controller
     val innerNavController = rememberNavController()
 
     Scaffold(
@@ -32,33 +33,61 @@ fun MainScreen(navController: NavHostController) {
             modifier = Modifier.padding(paddingValues)
         ) {
 
-            // HOME now receives navController
-            composable("home") { HomeScreen(innerNavController) }
+            // ------------------------
+            // HOME
+            // ------------------------
+            composable("home") {
+                // ✅ FIXED: pass ONLY root navController
+                HomeScreen(navController)
+            }
 
-            composable("friends") { FriendsScreen() }
-            composable("chat") { ChatScreen() }
-            composable("profile") { ProfileScreen() }
+            // ------------------------
+            // FRIENDS
+            // ------------------------
+            composable("friends") {
+                FriendsScreen(navController)
+            }
 
-            // Preference screen route
+            // ------------------------
+            // CHAT
+            // ------------------------
+            composable("chat") {
+                ChatScreen()
+            }
+
+            // ------------------------
+            // PROFILE
+            // ------------------------
+            composable("profile") {
+                ProfileScreen()
+            }
+
+            // ------------------------
+            // PREFERENCES
+            // ------------------------
             composable("preferences") {
                 PreferencesScreen(innerNavController)
             }
 
-            // Trek location detail screen
+            // ------------------------
+            // LOCATION DETAIL
+            // ------------------------
             composable("location_detail/{locationName}") { backStackEntry ->
-                val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
+                val locationName =
+                    backStackEntry.arguments?.getString("locationName") ?: ""
 
                 LocationDetailScreen(
                     locationName = locationName,
                     navController = innerNavController,
-                    onSave = { selectedLocation ->
-                        // For now: simply go back
+                    onSave = {
+                        innerNavController.popBackStack()
                     }
                 )
             }
         }
     }
 }
+
 
 
 

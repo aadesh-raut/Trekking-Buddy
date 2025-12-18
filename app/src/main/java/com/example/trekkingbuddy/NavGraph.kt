@@ -8,27 +8,25 @@ import com.example.trekkingbuddy.ui.auth.LoginScreen
 import com.example.trekkingbuddy.ui.auth.SignupScreen
 import com.example.trekkingbuddy.ui.home.HomeScreen
 import com.example.trekkingbuddy.ui.friends.FriendsScreen
+import com.example.trekkingbuddy.ui.friends.SuggestedFriendsScreen
 import com.example.trekkingbuddy.ui.chat.ChatScreen
 import com.example.trekkingbuddy.ui.profile.ProfileScreen
 import com.example.trekkingbuddy.ui.admin.AdminScreen
 import com.example.trekkingbuddy.ui.posts.PostsScreen
 import com.example.trekkingbuddy.ui.preferences.PreferencesScreen
 import com.example.trekkingbuddy.ui.preferences.LocationDetailScreen
+import com.example.trekkingbuddy.ui.notifications.NotificationScreen
 
 @Composable
 fun TrekkingNavGraph(
     navController: NavHostController,
     viewModel: AuthViewModel
 ) {
-
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
 
-        // ------------------------
-        // LOGIN SCREEN
-        // ------------------------
         composable("login") {
             LoginScreen(
                 viewModel = viewModel,
@@ -43,9 +41,6 @@ fun TrekkingNavGraph(
             )
         }
 
-        // ------------------------
-        // SIGNUP SCREEN
-        // ------------------------
         composable("signup") {
             SignupScreen(
                 viewModel = viewModel,
@@ -60,23 +55,17 @@ fun TrekkingNavGraph(
             )
         }
 
-        // ------------------------
-        // MAIN SCREEN (BOTTOM NAVIGATION)
-        // ------------------------
         composable("main_screen") {
             MainScreen(navController)
         }
 
-        // ------------------------
-        // SUB SCREENS (IF EVER DIRECTLY NEEDED)
-        // BUT NOW THEY MUST RECEIVE navController
-        // ------------------------
         composable("home") {
             HomeScreen(navController)
         }
 
+        // ✅ FIXED HERE
         composable("friends") {
-            FriendsScreen()
+            FriendsScreen(navController)
         }
 
         composable("chat") {
@@ -95,16 +84,10 @@ fun TrekkingNavGraph(
             AdminScreen()
         }
 
-        // ------------------------
-        // PREFERENCES
-        // ------------------------
         composable("preferences") {
             PreferencesScreen(navController)
         }
 
-        // ------------------------
-        // LOCATION DETAIL SCREEN
-        // ------------------------
         composable("location_detail/{locationName}") { backStackEntry ->
             val locationName =
                 backStackEntry.arguments?.getString("locationName") ?: ""
@@ -113,13 +96,24 @@ fun TrekkingNavGraph(
                 locationName = locationName,
                 navController = navController,
                 onSave = {
-                    // You can store to ViewModel or Firebase later
                     navController.popBackStack()
                 }
             )
         }
+
+        composable("notifications") {
+            NotificationScreen(navController)
+        }
+
+        composable("suggested_friends") {
+            SuggestedFriendsScreen(navController)
+        }
     }
 }
+
+
+
+
 
 
 

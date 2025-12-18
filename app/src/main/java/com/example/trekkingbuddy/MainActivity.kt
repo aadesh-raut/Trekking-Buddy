@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.trekkingbuddy.ui.theme.TrekkingBuddyTheme
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 class MainActivity : ComponentActivity() {
 
@@ -13,7 +15,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize Firebase Analytics
+        // --------------------------------------------
+        // ✅ ENABLE FIRESTORE OFFLINE PERSISTENCE
+        // --------------------------------------------
+        FirebaseFirestore.getInstance().firestoreSettings =
+            FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
+
+        // --------------------------------------------
+        // 🔵 Firebase Analytics
+        // --------------------------------------------
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         val bundle = Bundle().apply {
@@ -21,26 +33,24 @@ class MainActivity : ComponentActivity() {
         }
         firebaseAnalytics.logEvent("test_connection", bundle)
 
-        // Set Compose UI
+        // --------------------------------------------
+        // 🎨 Compose UI
+        // --------------------------------------------
         setContent {
             TrekkingBuddyTheme {
 
-                // Create Navigation Controller
                 val navController = androidx.navigation.compose.rememberNavController()
-
-                // Create ViewModel
                 val viewModel = AuthViewModel()
 
-                // Load Navigation Graph
                 TrekkingNavGraph(
                     navController = navController,
                     viewModel = viewModel
                 )
             }
         }
-
     }
 }
+
 
 
 

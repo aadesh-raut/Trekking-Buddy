@@ -9,23 +9,30 @@ class FriendsViewModel : ViewModel() {
 
     val suggestedFriends = mutableStateOf<List<UserModel>>(emptyList())
     val isLoading = mutableStateOf(false)
+    val errorMessage = mutableStateOf<String?>(null)
 
     fun loadSuggestedFriends() {
         viewModelScope.launch {
-            isLoading.value = true
-            suggestedFriends.value =
-                FriendsRepository.fetchSuggestedFriends()
+            try {
+                isLoading.value = true
+                errorMessage.value = null
 
-            isLoading.value = false
+                suggestedFriends.value =
+                    FriendsRepository.fetchSuggestedFriends()
+
+            } catch (e: Exception) {
+                errorMessage.value = "Failed to load suggested friends"
+                suggestedFriends.value = emptyList()
+            } finally {
+                isLoading.value = false
+            }
         }
     }
 
-
-
-    // 🔥 Call this after accept / reject
     fun refreshSuggestions() {
         loadSuggestedFriends()
     }
 }
+
 
 

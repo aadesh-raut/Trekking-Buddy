@@ -18,7 +18,7 @@ fun MainScreen(
     rootNavController: NavHostController
 ) {
 
-    // Controller ONLY for bottom tabs
+    // ✅ Controller ONLY for bottom tabs
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -34,15 +34,23 @@ fun MainScreen(
         ) {
 
             composable("home") {
-                HomeScreen(navController = rootNavController)
+                HomeScreen(
+                    bottomNavController = bottomNavController,
+                    rootNavController = rootNavController
+                )
             }
 
             composable("friends") {
-                FriendsScreen(rootNavController = rootNavController)
+                FriendsScreen(
+
+                    rootNavController = rootNavController
+                )
             }
 
             composable("chat") {
-                ChatsScreen(rootNavController = rootNavController)
+                ChatsScreen(
+                    rootNavController = rootNavController
+                )
             }
 
             composable("profile") {
@@ -51,6 +59,7 @@ fun MainScreen(
         }
     }
 }
+
 
 
 

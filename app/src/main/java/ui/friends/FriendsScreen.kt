@@ -34,7 +34,6 @@ fun FriendsScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            // ✅ GLOBAL navigation via ROOT controller
                             rootNavController.navigate("suggested_friends")
                         }
                     ) {
@@ -101,15 +100,19 @@ fun FriendRow(friend: UserModel) {
                 style = MaterialTheme.typography.titleMedium
             )
 
-            if (friend.selectedLocation.isNotEmpty()) {
-                Text(
-                    text = "Trek: ${friend.selectedLocation}",
-                    style = MaterialTheme.typography.bodySmall
-                )
+            // ✅ NULL-SAFE HANDLING
+            friend.selectedLocation?.let { location ->
+                if (location.isNotBlank()) {
+                    Text(
+                        text = "Trek: $location",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
 }
+
 
 
 

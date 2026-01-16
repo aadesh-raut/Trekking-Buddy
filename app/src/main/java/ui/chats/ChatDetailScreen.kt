@@ -27,8 +27,8 @@ fun ChatDetailScreen(
     var message by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    // 🔥 Start realtime listener
-    LaunchedEffect(Unit) {
+    // ✅ Correct key
+    LaunchedEffect(friendUid) {
         viewModel.startListening(friendUid)
     }
 
@@ -36,9 +36,7 @@ fun ChatDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(friendName) }
-            )
+            TopAppBar(title = { Text(friendName) })
         }
     ) { padding ->
 
@@ -48,11 +46,11 @@ fun ChatDetailScreen(
                 .padding(padding)
         ) {
 
-            // 💬 Messages list
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                reverseLayout = false
             ) {
                 items(messages) { msg ->
                     MessageBubble(
@@ -62,7 +60,6 @@ fun ChatDetailScreen(
                 }
             }
 
-            // ✍️ Message input
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,6 +92,7 @@ fun ChatDetailScreen(
         }
     }
 }
+
 
 
 

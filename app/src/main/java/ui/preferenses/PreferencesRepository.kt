@@ -4,36 +4,32 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
-
+import com.google.firebase.firestore.FieldValue
 private val db = FirebaseFirestore.getInstance()
 private val auth = FirebaseAuth.getInstance()
 
 // ------------------------------------------------------
 // SAVE SELECTED LOCATION
 // ------------------------------------------------------
-suspend fun saveSelectedLocationToFirebase(location: String) {
-    val userId = auth.currentUser?.uid ?: return
+suspend fun saveSelectedLocationToFirebase(locationName: String) {
+    val user = FirebaseAuth.getInstance().currentUser
+        ?: throw IllegalStateException("User not logged in")
 
-    // ✅ 1. Save at ROOT USER LEVEL (for matching users)
-    db.collection("users")
-        .document(userId)
-        .set(
-            mapOf("selectedLocation" to location),
-            SetOptions.merge()
-        )
-        .await()
+    val db = FirebaseFirestore.getInstance()
 
-    // ✅ 2. Save in preference sub-collection (UI / history)
     db.collection("users")
-        .document(userId)
-        .collection("preference")
-        .document("data")
+        .document(user.uid)
         .set(
-            mapOf("selectedLocation" to location),
+            mapOf(
+                "selectedLocation" to locationName, // ✅ FIX HERE
+                "updatedAt" to FieldValue.serverTimestamp()
+            ),
             SetOptions.merge()
         )
         .await()
 }
+
+
 
 // ------------------------------------------------------
 // FETCH SELECTED LOCATION

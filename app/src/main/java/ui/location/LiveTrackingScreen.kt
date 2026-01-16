@@ -20,6 +20,247 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.location.*
+import com.google.maps.android.compose.*
+
+//@Composable
+//fun LiveTrackingScreen() {
+//
+//    // 📍 Trek Path
+//    var trekPath by remember { mutableStateOf<List<TrekLocationPoint>>(emptyList()) }
+//
+//    // 📏 Distance (meters)
+//    var totalDistance by remember { mutableStateOf(0f) }
+//
+//    // ⏱ Time
+//    var startTime by remember { mutableStateOf<Long?>(null) }
+//    var duration by remember { mutableStateOf(0L) } // milliseconds
+//
+//    // 📍 Location state
+//    var latitude by remember { mutableStateOf<Double?>(null) }
+//    var longitude by remember { mutableStateOf<Double?>(null) }
+//    var isTracking by remember { mutableStateOf(false) }
+//
+//    val context = LocalContext.current
+//    val fusedLocationClient =
+//        remember { LocationServices.getFusedLocationProviderClient(context) }
+//
+//    val cameraPositionState = rememberCameraPositionState()
+//
+//    val locationCallback = remember {
+//        object : LocationCallback() {
+//            override fun onLocationResult(result: LocationResult) {
+//                val location = result.lastLocation ?: return
+//
+//                latitude = location.latitude
+//                longitude = location.longitude
+//
+//                if (trekPath.isNotEmpty()) {
+//                    val last = trekPath.last()
+//                    totalDistance += calculateDistance(
+//                        last.latitude,
+//                        last.longitude,
+//                        location.latitude,
+//                        location.longitude
+//                    )
+//                }
+//
+//                trekPath = trekPath + TrekLocationPoint(
+//                    latitude = location.latitude,
+//                    longitude = location.longitude,
+//                    timestamp = System.currentTimeMillis()
+//                )
+//
+//                startTime?.let {
+//                    duration = System.currentTimeMillis() - it
+//                }
+//            }
+//        }
+//    }
+//
+//
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            fusedLocationClient.removeLocationUpdates(locationCallback)
+//        }
+//    }
+//
+//
+//
+//
+//
+//    // 🔁 Location request
+//    val locationRequest = remember {
+//        LocationRequest.Builder(
+//            Priority.PRIORITY_HIGH_ACCURACY,
+//            5000L // 5 seconds
+//        ).build()
+//    }
+//
+//    // 📡 Location callback
+//
+//    val currentLocationCallback by rememberUpdatedState(locationCallback)
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//
+//        Text(
+//            text = "Live GPS Tracking",
+//            style = MaterialTheme.typography.headlineMedium
+//        )
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        GoogleMap(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(300.dp),
+//            cameraPositionState = cameraPositionState,
+//            properties = MapProperties(
+//                isMyLocationEnabled = hasLocationPermission   // ✅ SAFE
+//            ),
+//            uiSettings = MapUiSettings(
+//                zoomControlsEnabled = true
+//            )
+//        ) {
+//
+//            // 📍 Draw live route
+//            if (trekPath.size > 1) {
+//                Polyline(
+//                    points = trekPath.map {
+//                        LatLng(it.latitude, it.longitude)
+//                    },
+//                    color = androidx.compose.ui.graphics.Color.Red,
+//                    width = 8f
+//                )
+//            }
+//
+//            // 🎯 Move camera to latest position
+//            trekPath.lastOrNull()?.let {
+//                LaunchedEffect(it) {
+//                    cameraPositionState.animate(
+//                        CameraUpdateFactory.newLatLngZoom(
+//                            LatLng(it.latitude, it.longitude),
+//                            17f
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//
+//
+//        // ▶ START TRACKING
+//        Button(
+//            onClick = {
+//                if (!hasLocationPermission) return@Button
+//
+//                isTracking = true
+//
+//                // Reset old data
+//                trekPath = emptyList()
+//                totalDistance = 0f
+//                duration = 0L
+//
+//                // Save start time
+//                startTime = System.currentTimeMillis()
+//
+//                // Start GPS updates
+//                startLocationUpdates(
+//                    fusedLocationClient,
+//                    locationRequest,
+//                    locationCallback
+//                )
+//            },
+//            enabled = !isTracking && hasLocationPermission
+//        ) {
+//            Text("Start Tracking 📍")
+//        }
+//
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // ⛔ STOP TRACKING
+//        Button(
+//            onClick = {
+//                isTracking = false
+//
+//                fusedLocationClient.removeLocationUpdates(locationCallback)
+//
+//                // Final duration
+//                duration = System.currentTimeMillis() -
+//                        (startTime ?: System.currentTimeMillis())
+//            },
+//            enabled = isTracking
+//        ) {
+//            Text("Stop Tracking ⛔")
+//        }
+//
+//        Spacer(modifier = Modifier.height(32.dp))
+//
+//        // 📊 LIVE STATS
+//        if (latitude != null && longitude != null) {
+//
+//            Text("Latitude: ${latitude}")
+//            Text("Longitude: ${longitude}")
+//
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            Text(
+//                text = "📏 Distance: ${(totalDistance / 1000).format(2)} km",
+//                style = MaterialTheme.typography.bodyLarge
+//            )
+//
+//            Text(
+//                text = "⏱ Duration: ${(duration / 60000)} minutes",
+//                style = MaterialTheme.typography.bodyLarge
+//            )
+//
+//        } else {
+//            Text("Waiting for GPS signal...")
+//        }
+//    }
+//}
+//
+//@SuppressLint("MissingPermission")
+//private fun startLocationUpdates(
+//    fusedLocationClient: FusedLocationProviderClient,
+//    locationRequest: LocationRequest,
+//    locationCallback: LocationCallback
+//) {
+//    fusedLocationClient.requestLocationUpdates(
+//        locationRequest,
+//        locationCallback,
+//        Looper.getMainLooper()
+//    )
+//}
+//
+//// 📏 Distance calculation helper
+//fun calculateDistance(
+//    oldLat: Double,
+//    oldLng: Double,
+//    newLat: Double,
+//    newLng: Double
+//): Float {
+//    val result = FloatArray(1)
+//    Location.distanceBetween(
+//        oldLat, oldLng,
+//        newLat, newLng,
+//        result
+//    )
+//    return result[0] // meters
+//}
+//
+//// 🔢 Format helper
+//fun Float.format(digits: Int): String {
+//    return "%.${digits}f".format(this)
+//} errors at HasLocationPermission
+
 
 @Composable
 fun LiveTrackingScreen() {
@@ -32,7 +273,7 @@ fun LiveTrackingScreen() {
 
     // ⏱ Time
     var startTime by remember { mutableStateOf<Long?>(null) }
-    var duration by remember { mutableStateOf(0L) } // milliseconds
+    var duration by remember { mutableStateOf(0L) }
 
     // 📍 Location state
     var latitude by remember { mutableStateOf<Double?>(null) }
@@ -45,15 +286,6 @@ fun LiveTrackingScreen() {
 
     val cameraPositionState = rememberCameraPositionState()
 
-
-    // 🔁 Location request
-    val locationRequest = remember {
-        LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            5000L // 5 seconds
-        ).build()
-    }
-
     // 📡 Location callback
     val locationCallback = remember {
         object : LocationCallback() {
@@ -63,7 +295,6 @@ fun LiveTrackingScreen() {
                 latitude = location.latitude
                 longitude = location.longitude
 
-                // 📏 Distance calculation
                 if (trekPath.isNotEmpty()) {
                     val last = trekPath.last()
                     totalDistance += calculateDistance(
@@ -74,19 +305,32 @@ fun LiveTrackingScreen() {
                     )
                 }
 
-                // 📍 Save path point
                 trekPath = trekPath + TrekLocationPoint(
                     latitude = location.latitude,
                     longitude = location.longitude,
                     timestamp = System.currentTimeMillis()
                 )
 
-                // ⏱ Live duration update
                 startTime?.let {
                     duration = System.currentTimeMillis() - it
                 }
             }
         }
+    }
+
+    // 🧹 Cleanup GPS when leaving screen
+    DisposableEffect(Unit) {
+        onDispose {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
+    }
+
+    // 🔁 Location request
+    val locationRequest = remember {
+        LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            5000L
+        ).build()
     }
 
     Column(
@@ -96,10 +340,7 @@ fun LiveTrackingScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = "Live GPS Tracking",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        Text("Live GPS Tracking", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -109,14 +350,13 @@ fun LiveTrackingScreen() {
                 .height(300.dp),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                isMyLocationEnabled = true
+                isMyLocationEnabled = true // ✅ SAFE
             ),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true
             )
         ) {
 
-            // 📍 Draw live route
             if (trekPath.size > 1) {
                 Polyline(
                     points = trekPath.map {
@@ -127,7 +367,6 @@ fun LiveTrackingScreen() {
                 )
             }
 
-            // 🎯 Move camera to latest position
             trekPath.lastOrNull()?.let {
                 LaunchedEffect(it) {
                     cameraPositionState.animate(
@@ -140,21 +379,16 @@ fun LiveTrackingScreen() {
             }
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // ▶ START TRACKING
         Button(
             onClick = {
                 isTracking = true
-
-                // Reset old data
                 trekPath = emptyList()
                 totalDistance = 0f
                 duration = 0L
-
-                // Save start time
                 startTime = System.currentTimeMillis()
 
-                // Start GPS updates
                 startLocationUpdates(
                     fusedLocationClient,
                     locationRequest,
@@ -168,16 +402,10 @@ fun LiveTrackingScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ⛔ STOP TRACKING
         Button(
             onClick = {
                 isTracking = false
-
                 fusedLocationClient.removeLocationUpdates(locationCallback)
-
-                // Final duration
-                duration = System.currentTimeMillis() -
-                        (startTime ?: System.currentTimeMillis())
             },
             enabled = isTracking
         ) {
@@ -186,44 +414,22 @@ fun LiveTrackingScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 📊 LIVE STATS
         if (latitude != null && longitude != null) {
-
-            Text("Latitude: ${latitude}")
-            Text("Longitude: ${longitude}")
+            Text("Latitude: $latitude")
+            Text("Longitude: $longitude")
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "📏 Distance: ${(totalDistance / 1000).format(2)} km",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Text(
-                text = "⏱ Duration: ${(duration / 60000)} minutes",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
+            Text("📏 Distance: ${(totalDistance / 1000).format(2)} km")
+            Text("⏱ Duration: ${duration / 60000} minutes")
         } else {
             Text("Waiting for GPS signal...")
         }
     }
 }
-
-@SuppressLint("MissingPermission")
-private fun startLocationUpdates(
-    fusedLocationClient: FusedLocationProviderClient,
-    locationRequest: LocationRequest,
-    locationCallback: LocationCallback
-) {
-    fusedLocationClient.requestLocationUpdates(
-        locationRequest,
-        locationCallback,
-        Looper.getMainLooper()
-    )
+fun Float.format(digits: Int): String {
+    return "%.${digits}f".format(this)
 }
-
-// 📏 Distance calculation helper
 fun calculateDistance(
     oldLat: Double,
     oldLng: Double,
@@ -238,11 +444,19 @@ fun calculateDistance(
     )
     return result[0] // meters
 }
-
-// 🔢 Format helper
-fun Float.format(digits: Int): String {
-    return "%.${digits}f".format(this)
+@SuppressLint("MissingPermission")
+fun startLocationUpdates(
+    fusedLocationClient: FusedLocationProviderClient,
+    locationRequest: LocationRequest,
+    locationCallback: LocationCallback
+) {
+    fusedLocationClient.requestLocationUpdates(
+        locationRequest,
+        locationCallback,
+        Looper.getMainLooper()
+    )
 }
+
 
 
 

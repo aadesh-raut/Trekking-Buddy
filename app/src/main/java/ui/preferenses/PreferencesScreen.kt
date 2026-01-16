@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import android.net.Uri
+
 
 @Composable
 fun PreferencesScreen(navController: NavHostController) {
@@ -59,6 +61,7 @@ fun PreferencesScreen(navController: NavHostController) {
                         .padding(vertical = 8.dp)
                         .clickable {
                             // 👉 Navigate to location detail screen
+                            val encodedLocation = Uri.encode(location)
                             navController.navigate("location_detail/$location")
                         },
                     elevation = CardDefaults.cardElevation(4.dp)

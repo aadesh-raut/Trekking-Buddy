@@ -10,8 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @Composable
@@ -22,13 +22,13 @@ fun SuggestedFriendsScreen(
 
     val scope = rememberCoroutineScope()
 
-    // 🔥 VERY IMPORTANT: refresh when screen is re-entered
-    LaunchedEffect(navController.currentBackStackEntry) {
+    LaunchedEffect(Unit) {
         viewModel.loadSuggestedFriends()
     }
 
     val friends = viewModel.suggestedFriends.value
     val isLoading = viewModel.isLoading.value
+    val error = viewModel.errorMessage.value
 
     Column(
         modifier = Modifier
@@ -36,12 +36,11 @@ fun SuggestedFriendsScreen(
             .padding(16.dp)
     ) {
 
-        // 🔙 Back Button
         IconButton(onClick = { navController.popBackStack() }) {
             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = "Suggested Friends",
@@ -60,9 +59,16 @@ fun SuggestedFriendsScreen(
                 }
             }
 
+            error != null -> {
+                Text(
+                    text = error,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             friends.isEmpty() -> {
                 Text(
-                    text = "No trekkers found with the same location yet.",
+                    text = "No trekkers found with the same selected trek yet.",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -74,12 +80,15 @@ fun SuggestedFriendsScreen(
                             user = user,
                             onAddClick = {
                                 scope.launch {
-                                    FriendRequestRepository.sendFriendRequest(
-                                        receiverId = user.uid,
-                                        receiverUsername = user.username
-                                    )
-                                    // 🔥 Refresh list after sending request
-                                    viewModel.loadSuggestedFriends()
+                                    try {
+                                        FriendRequestRepository.sendFriendRequest(
+                                            receiverId = user.uid,
+                                            receiverUsername = user.username
+                                        )
+                                        viewModel.refreshSuggestions()
+                                    } catch (e: Exception) {
+                                        // silently ignore / log later
+                                    }
                                 }
                             }
                         )
@@ -90,12 +99,12 @@ fun SuggestedFriendsScreen(
     }
 }
 
+
 @Composable
 fun FriendItem(
     user: UserModel,
     onAddClick: () -> Unit
 ) {
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +126,7 @@ fun FriendItem(
                 )
 
                 Text(
-                    text = "Trek: ${user.selectedLocation}",
+                    text = "Trek: ${user.selectedLocation ?: "Not selected"}",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -128,6 +137,7 @@ fun FriendItem(
         }
     }
 }
+
 
 
 

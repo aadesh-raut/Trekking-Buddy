@@ -17,18 +17,22 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import com.example.trekkingbuddy.R
 import com.example.trekkingbuddy.data.ProfileRepository
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.res.painterResource
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDetailScreen(
     locationName: String,
-    navController: NavHostController,
-    onSave: (String) -> Unit
+    navController: NavHostController
 ) {
     var isSelected by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+
 
     // ✅ ALL 20 TREKS — FULL DATA
     val trekInfoMap = mapOf(
@@ -553,127 +557,262 @@ fun LocationDetailScreen(
 
     val trek = trekInfoMap[locationName]
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-
-        // 🔙 Back Button
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // 🖼 Trek Image
-        trek?.let {
-            Image(
-                painter = painterResource(it.imageRes),
-                contentDescription = locationName,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp),
-                contentScale = ContentScale.Crop
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .verticalScroll(rememberScrollState())
+//            .padding(16.dp)
+//    ) {
+//
+//        // 🔙 Back Button
+//        IconButton(onClick = { navController.popBackStack() }) {
+//            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        // 🖼 Trek Image
+//        trek?.let {
+//            Image(
+//                painter = painterResource(it.imageRes),
+//                contentDescription = locationName,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(220.dp),
+//                contentScale = ContentScale.Crop
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // 📍 Trek Name
+//        Text(
+//            text = locationName,
+//            style = MaterialTheme.typography.headlineMedium
+//        )
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//        // 📝 Description
+//        Text(
+//            text = trek?.description ?: "",
+//            style = MaterialTheme.typography.bodyLarge
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // ⏱ Info
+//        Text("🗓 Best Season: ${trek?.bestSeason}")
+//        Text("⏱ Duration: ${trek?.duration}")
+//
+//        Spacer(modifier = Modifier.height(32.dp))
+//
+//        // ℹ Routes
+//        Text(
+//            text = "ℹ Trek Information & Routes",
+//            style = MaterialTheme.typography.titleMedium
+//        )
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//        trek?.startingPoints?.forEach { info ->
+//            Text(
+//                text = info,
+//                style = MaterialTheme.typography.bodyMedium,
+//                modifier = Modifier.padding(bottom = 16.dp)
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        // 🏔️ MARK AS COMPLETED
+//        Button(
+//            onClick = {
+//                ProfileRepository.markTrekAsCompleted(
+//                    trekId = locationName,
+//                    trekName = locationName
+//                )
+//            },
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Mark as Completed 🏔️")
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // 📍 START LIVE TRACKING
+//        Button(
+//            onClick = {
+//                navController.navigate("live_tracking")
+//            },
+//            modifier = Modifier.fillMaxWidth(),
+//            colors = ButtonDefaults.buttonColors(
+//                containerColor = MaterialTheme.colorScheme.secondary
+//            )
+//        ) {
+//            Text("Start Live Tracking 📍")
+//        }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(locationName) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         }
+    ) { padding ->
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
 
-        // 📍 Trek Name
-        Text(
-            text = locationName,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // 📝 Description
-        Text(
-            text = trek?.description ?: "",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ⏱ Info
-        Text("🗓 Best Season: ${trek?.bestSeason}")
-        Text("⏱ Duration: ${trek?.duration}")
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // ℹ Routes
-        Text(
-            text = "ℹ Trek Information & Routes",
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        trek?.startingPoints?.forEach { info ->
-            Text(
-                text = info,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 🏔️ MARK AS COMPLETED
-        Button(
-            onClick = {
-                ProfileRepository.markTrekAsCompleted(
-                    trekId = locationName,
-                    trekName = locationName
+            trek?.let {
+                Image(
+                    painter = painterResource(it.imageRes),
+                    contentDescription = locationName,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
+                    contentScale = ContentScale.Crop
                 )
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Mark as Completed 🏔️")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 📍 START LIVE TRACKING
-        Button(
-            onClick = {
-                navController.navigate("live_tracking")
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary
-            )
-        ) {
-            Text("Start Live Tracking 📍")
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // ✅ CANCEL / SELECT
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(onClick = { navController.popBackStack() }) {
-                Text("Cancel")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = trek?.description ?: "",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text("🗓 Best Season: ${trek?.bestSeason}")
+            Text("⏱ Duration: ${trek?.duration}")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "ℹ Trek Information",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            trek?.startingPoints?.forEach { info ->
+                Text(
+                    text = info,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ✅ SAVE PREFERENCE (SAFE)
+//            Button(
+//                modifier = Modifier.fillMaxWidth(),
+//                onClick = {
+//                    scope.launch {
+//                        saveSelectedLocationToFirebase(locationName)
+//                        navController.popBackStack()
+//                    }
+//                }
+//            ) {
+//                Text("Save as Preferred Trek ✅")
+//            }
 
             Button(
                 onClick = {
-                    scope.launch {
-                        saveSelectedLocationToFirebase(locationName)
-                        onSave(locationName)
-                    }
-                }
+                    navController.navigate("live_tracking")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
             ) {
-                Text("Select")
+                Text("Start Live Tracking 📍")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 📍 START LIVE TRACKING
+
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+// ✅ CANCEL / SELECT (SAFE VERSION)
+            // ✅ CANCEL / SELECT
+            // ✅ CANCEL / SELECT
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Button(
+                    onClick = { navController.popBackStack() }
+                ) {
+                    Text("Cancel")
+                }
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                saveSelectedLocationToFirebase(locationName)
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    e.message ?: "Save failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                ) {
+                    Text("Select")
+                }
+
+            }
+
+
+        }
+
         }
     }
 
-}
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        // ✅ CANCEL / SELECT
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            Button(onClick = { navController.popBackStack() }) {
+//                Text("Cancel")
+//            }
+//
+//            Button(
+//                onClick = {
+//                    scope.launch {
+//                        saveSelectedLocationToFirebase(locationName)
+//                        onSave(locationName)
+//                    }
+//                }
+//            ) {
+//                Text("Select")
+//            }
+//        }
+//    }
+//
+//}
 
 data class TrekInfo(
     val imageRes: Int,

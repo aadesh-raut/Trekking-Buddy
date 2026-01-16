@@ -14,7 +14,9 @@ import com.example.trekkingbuddy.ui.preferences.fetchSelectedLocationFromFirebas
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavHostController
+//    navController: NavHostController
+    bottomNavController: NavHostController,
+    rootNavController: NavHostController
 ) {
 
     var selectedLocation by remember { mutableStateOf<String?>(null) }
@@ -33,7 +35,7 @@ fun HomeScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            navController.navigate("notifications")
+                            rootNavController.navigate("notifications")
                         }
                     ) {
                         Icon(
@@ -88,7 +90,7 @@ fun HomeScreen(
 
             Button(
                 onClick = {
-                    navController.navigate("preferences")
+                    rootNavController.navigate("preferences")
                 }
             ) {
                 Text("Preferences")

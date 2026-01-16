@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 
 @Composable
@@ -30,15 +29,13 @@ fun LocationPermission(
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasPermission = isGranted
+    ) { granted ->
+        hasPermission = granted
     }
 
     if (hasPermission) {
-        // ✅ SAFE: emit UI
         content()
     } else {
-        // Permission UI
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -55,4 +52,8 @@ fun LocationPermission(
         }
     }
 }
+
+
+
+
 

@@ -42,7 +42,12 @@ object ChatRepository {
             .document(chatId)
             .collection("messages")
             .orderBy("timestamp")
-            .addSnapshotListener { snapshot, _ ->
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    error.printStackTrace()
+                    return@addSnapshotListener
+                }
+
                 if (snapshot != null) {
                     val messages = snapshot.documents.mapNotNull {
                         it.toObject(ChatMessageModel::class.java)
@@ -53,5 +58,6 @@ object ChatRepository {
 
         awaitClose { listener.remove() }
     }
+
 }
 

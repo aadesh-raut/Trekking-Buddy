@@ -1,8 +1,7 @@
 package com.example.trekkingbuddy
 
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -16,32 +15,32 @@ fun BottomNavigationBar(navController: NavHostController) {
         BottomNavItem.Profile
     )
 
-    NavigationBar {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
+    NavigationBar {
         items.forEach { item ->
             NavigationBarItem(
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
+                        popUpTo("home") { saveState = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 },
-                label = { Text(item.label) },
                 icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label
-                    )
+                    Icon(item.icon, contentDescription = item.label)
+                },
+                label = {
+                    Text(item.label)
                 }
             )
         }
     }
 }
+
+
+
 
 

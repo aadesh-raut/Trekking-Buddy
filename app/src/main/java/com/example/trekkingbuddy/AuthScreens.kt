@@ -73,7 +73,7 @@ fun LoginScreen(
 }
 
 // -----------------------------------------------------
-// SIGNUP SCREEN
+// SIGNUP SCREEN (WITH USERNAME)
 // -----------------------------------------------------
 @Composable
 fun SignupScreen(
@@ -81,6 +81,7 @@ fun SignupScreen(
     onNavigateToLogin: () -> Unit,
     onSignupSuccess: () -> Unit
 ) {
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -94,6 +95,13 @@ fun SignupScreen(
 
         Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         OutlinedTextField(
             value = email,
@@ -115,8 +123,9 @@ fun SignupScreen(
         Button(
             onClick = {
                 viewModel.signup(
-                    email,
-                    password,
+                    email = email,
+                    password = password,
+                    username = username,
                     onSuccess = onSignupSuccess,
                     onError = { errorMessage = it }
                 )
@@ -135,6 +144,8 @@ fun SignupScreen(
         }
     }
 }
+
+
 
 
 

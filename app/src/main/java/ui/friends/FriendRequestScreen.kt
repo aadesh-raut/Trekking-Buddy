@@ -11,23 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun SuggestedFriendsScreen(
+fun FriendRequestsScreen(
     navController: NavHostController,
-    viewModel: FriendsViewModel = viewModel()
+    viewModel: FriendRequestViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
 
-    val scope = rememberCoroutineScope()
-
-    // 🔥 VERY IMPORTANT: refresh when screen is re-entered
-    LaunchedEffect(navController.currentBackStackEntry) {
-        viewModel.loadSuggestedFriends()
+    LaunchedEffect(Unit) {
+        viewModel.loadIncomingRequests()
     }
 
-    val friends = viewModel.suggestedFriends.value
+    val requests = viewModel.incomingRequests.value
     val isLoading = viewModel.isLoading.value
 
     Column(
@@ -36,7 +31,7 @@ fun SuggestedFriendsScreen(
             .padding(16.dp)
     ) {
 
-        // 🔙 Back Button
+        // 🔙 Back
         IconButton(onClick = { navController.popBackStack() }) {
             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
         }
@@ -44,7 +39,7 @@ fun SuggestedFriendsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Suggested Friends",
+            text = "Friend Requests",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -60,27 +55,20 @@ fun SuggestedFriendsScreen(
                 }
             }
 
-            friends.isEmpty() -> {
-                Text(
-                    text = "No trekkers found with the same location yet.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            requests.isEmpty() -> {
+                Text("No friend requests yet.")
             }
 
             else -> {
                 LazyColumn {
-                    items(friends) { user ->
-                        FriendItem(
-                            user = user,
-                            onAddClick = {
-                                scope.launch {
-                                    FriendRequestRepository.sendFriendRequest(
-                                        receiverId = user.uid,
-                                        receiverUsername = user.username
-                                    )
-                                    // 🔥 Refresh list after sending request
-                                    viewModel.loadSuggestedFriends()
-                                }
+                    items(requests) { request ->
+                        FriendRequestItem(
+                            request = request,
+                            onAccept = {
+                                viewModel.acceptRequest(request.senderUid)
+                            },
+                            onReject = {
+                                viewModel.rejectRequest(request.senderUid)
                             }
                         )
                     }
@@ -91,9 +79,10 @@ fun SuggestedFriendsScreen(
 }
 
 @Composable
-fun FriendItem(
-    user: UserModel,
-    onAddClick: () -> Unit
+fun FriendRequestItem(
+    request: FriendRequestModel,
+    onAccept: () -> Unit,
+    onReject: () -> Unit
 ) {
 
     Card(
@@ -110,26 +99,23 @@ fun FriendItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Column {
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.titleMedium
-                )
+            Text(
+                text = request.senderUsername,
+                style = MaterialTheme.typography.titleMedium
+            )
 
-                Text(
-                    text = "Trek: ${user.selectedLocation}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+            Row {
+                Button(onClick = onAccept) {
+                    Text("Accept")
+                }
 
-            Button(onClick = onAddClick) {
-                Text("Add")
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedButton(onClick = onReject) {
+                    Text("Decline")
+                }
             }
         }
     }
 }
-
-
-
-
 

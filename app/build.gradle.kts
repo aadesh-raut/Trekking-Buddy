@@ -47,7 +47,9 @@ android {
 
 dependencies {
 
-    // Compose
+    // -----------------------------
+    // 🧩 Jetpack Compose
+    // -----------------------------
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -66,7 +68,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     // -----------------------------
-    // ✅ Firebase (Correct KTS Format)
+    // 🔥 Firebase (BOM manages versions)
     // -----------------------------
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
 
@@ -74,7 +76,15 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // Testing
+    // ✅ THIS WAS MISSING (FIXES YOUR ERROR)
+    implementation("com.google.firebase:firebase-storage-ktx")
+
+    // 🖼️ Image loading (profile photo)
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // -----------------------------
+    // 🧪 Testing
+    // -----------------------------
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,6 +92,11 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation ("androidx.compose.foundation:foundation")
+    implementation ("androidx.compose.material3:material3")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
 }
+
 
 

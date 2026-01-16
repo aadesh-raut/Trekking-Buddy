@@ -4,18 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.trekkingbuddy.ui.admin.AdminScreen
 import com.example.trekkingbuddy.ui.auth.LoginScreen
 import com.example.trekkingbuddy.ui.auth.SignupScreen
-import com.example.trekkingbuddy.ui.home.HomeScreen
-import com.example.trekkingbuddy.ui.friends.FriendsScreen
-import com.example.trekkingbuddy.ui.friends.SuggestedFriendsScreen
-import com.example.trekkingbuddy.ui.chat.ChatScreen
-import com.example.trekkingbuddy.ui.profile.ProfileScreen
-import com.example.trekkingbuddy.ui.admin.AdminScreen
-import com.example.trekkingbuddy.ui.posts.PostsScreen
-import com.example.trekkingbuddy.ui.preferences.PreferencesScreen
-import com.example.trekkingbuddy.ui.preferences.LocationDetailScreen
+import com.example.trekkingbuddy.ui.chat.ChatDetailScreen
+import com.example.trekkingbuddy.ui.location.LiveTrackingScreen
+import com.example.trekkingbuddy.ui.location.LocationPermission
 import com.example.trekkingbuddy.ui.notifications.NotificationScreen
+import com.example.trekkingbuddy.ui.posts.PostsScreen
+import com.example.trekkingbuddy.ui.friends.FriendRequestsScreen
+import com.example.trekkingbuddy.ui.friends.SuggestedFriendsScreen
 
 @Composable
 fun TrekkingNavGraph(
@@ -27,6 +25,7 @@ fun TrekkingNavGraph(
         startDestination = "login"
     ) {
 
+        // ---------------- AUTH ----------------
         composable("login") {
             LoginScreen(
                 viewModel = viewModel,
@@ -34,6 +33,7 @@ fun TrekkingNavGraph(
                     navController.navigate("signup")
                 },
                 onLoginSuccess = {
+                    // ✅ ALWAYS go to main_screen
                     navController.navigate("main_screen") {
                         popUpTo("login") { inclusive = true }
                     }
@@ -48,6 +48,7 @@ fun TrekkingNavGraph(
                     navController.popBackStack()
                 },
                 onSignupSuccess = {
+                    // ✅ ALWAYS go to main_screen
                     navController.navigate("main_screen") {
                         popUpTo("signup") { inclusive = true }
                     }
@@ -55,25 +56,23 @@ fun TrekkingNavGraph(
             )
         }
 
+        // ---------------- MAIN (BOTTOM NAV HOLDER) ----------------
         composable("main_screen") {
-            MainScreen(navController)
+            MainScreen(rootNavController = navController)
         }
 
-        composable("home") {
-            HomeScreen(navController)
+        // ---------------- CHAT DETAIL (GLOBAL) ----------------
+        composable("chat/{friendUid}/{friendName}") { backStackEntry ->
+            ChatDetailScreen(
+                navController = navController,
+                friendUid = backStackEntry.arguments?.getString("friendUid") ?: "",
+                friendName = backStackEntry.arguments?.getString("friendName") ?: ""
+            )
         }
 
-        // ✅ FIXED HERE
-        composable("friends") {
-            FriendsScreen(navController)
-        }
-
-        composable("chat") {
-            ChatScreen()
-        }
-
-        composable("profile") {
-            ProfileScreen()
+        // ---------------- GLOBAL SCREENS ----------------
+        composable("notifications") {
+            NotificationScreen(navController)
         }
 
         composable("posts") {
@@ -84,32 +83,31 @@ fun TrekkingNavGraph(
             AdminScreen()
         }
 
-        composable("preferences") {
-            PreferencesScreen(navController)
-        }
-
-        composable("location_detail/{locationName}") { backStackEntry ->
-            val locationName =
-                backStackEntry.arguments?.getString("locationName") ?: ""
-
-            LocationDetailScreen(
-                locationName = locationName,
-                navController = navController,
-                onSave = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable("notifications") {
-            NotificationScreen(navController)
-        }
-
         composable("suggested_friends") {
             SuggestedFriendsScreen(navController)
         }
+
+        composable("friend_requests") {
+            FriendRequestsScreen(navController)
+        }
+
+        // ---------------- LIVE TRACKING ----------------
+        composable("live_tracking") {
+            LocationPermission {
+                LiveTrackingScreen()
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 

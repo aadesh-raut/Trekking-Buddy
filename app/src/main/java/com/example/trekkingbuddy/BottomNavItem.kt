@@ -11,8 +11,9 @@ sealed class BottomNavItem(
 ) {
     object Home : BottomNavItem("home", "Home", Icons.Filled.Home)
     object Friends : BottomNavItem("friends", "Friends", Icons.Filled.People)
-    object Chat : BottomNavItem("chat", "Chat", Icons.Filled.Chat)
+    object Chat : BottomNavItem("chat_list", "Chat", Icons.Filled.Chat)
     object Profile : BottomNavItem("profile", "Profile", Icons.Filled.Person)
 }
+
 
 

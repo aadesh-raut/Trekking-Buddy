@@ -3,6 +3,7 @@ package com.example.trekkingbuddy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.navigation.compose.rememberNavController
 import com.example.trekkingbuddy.ui.theme.TrekkingBuddyTheme
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,17 +40,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             TrekkingBuddyTheme {
 
-                val navController = androidx.navigation.compose.rememberNavController()
-                val viewModel = AuthViewModel()
+                // ✅ ONE NavController for entire app
+                val navController = rememberNavController()
 
+                // ✅ Auth ViewModel
+                val authViewModel = AuthViewModel()
+
+                // ✅ App Navigation Graph
                 TrekkingNavGraph(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = authViewModel
                 )
             }
         }
     }
 }
+
 
 
 

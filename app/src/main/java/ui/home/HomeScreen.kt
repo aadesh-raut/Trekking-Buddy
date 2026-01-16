@@ -1,9 +1,9 @@
 package com.example.trekkingbuddy.ui.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +20,7 @@ fun HomeScreen(
     var selectedLocation by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Fetch preference from Firebase
+    // 🔥 Fetch preference from Firebase
     LaunchedEffect(Unit) {
         selectedLocation = fetchSelectedLocationFromFirebase()
         isLoading = false
@@ -33,7 +33,6 @@ fun HomeScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            // 🔔 Notifications navigation
                             navController.navigate("notifications")
                         }
                     ) {
@@ -74,16 +73,12 @@ fun HomeScreen(
                 isLoading -> CircularProgressIndicator()
 
                 selectedLocation.isNullOrEmpty() -> {
-                    Text(
-                        text = "No preference selected",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Text("No preference selected")
                 }
 
                 else -> {
                     Text(
                         text = selectedLocation!!,
-                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -92,13 +87,17 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
-                onClick = { navController.navigate("preferences") }
+                onClick = {
+                    navController.navigate("preferences")
+                }
             ) {
                 Text("Preferences")
             }
         }
     }
 }
+
+
 
 
 
